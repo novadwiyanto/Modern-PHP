@@ -27,9 +27,15 @@
                         <h6>Karir :</h6>
                         @foreach ($itemP[0]->karir as $itemKarir)
                             @if (!empty($itemKarir))
-                                <p style="text-align: left">
-                                    {{ $itemKarir->jabatan . ' ' . $itemKarir->tahun_mulai . '-' . $itemKarir->tahun_selesai }}
-                                </p>
+                                @if ($itemKarir->tahun_selesai === 0)
+                                    <p style="text-align: left">
+                                        {{ $itemKarir->jabatan . ' ' . $itemKarir->tahun_mulai . '-' . 'Sekarang' }}
+                                    </p>
+                                @else
+                                    <p style="text-align: left">
+                                        {{ $itemKarir->jabatan . ' ' . $itemKarir->tahun_mulai . '-' . $itemKarir->tahun_selesai }}
+                                    </p>
+                                @endif
                             @endif
                         @endforeach
                     </div>
