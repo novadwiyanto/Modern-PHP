@@ -38,11 +38,11 @@ class CapresController extends Controller
             $data = json_decode($response, true);
 
             foreach ($data['calon_presiden'] as $item) {
-                $capresDTO[] = self::parseCalonDTO($item, PosisiEnum::PRESIDEN);
+                $capresDTO[] = $this->parseCalonDTO($item, PosisiEnum::PRESIDEN);
             }
 
             foreach ($data['calon_wakil_presiden'] as $item) {
-                $cawapresDTO[] = self::parseCalonDTO($item, PosisiEnum::WAKIL_PRESIDEN);
+                $cawapresDTO[] = $this->parseCalonDTO($item, PosisiEnum::WAKIL_PRESIDEN);
             }
 
             return view('capres', ['capres' => $capresDTO, 'cawapres' => $cawapresDTO]);
