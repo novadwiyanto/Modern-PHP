@@ -54,7 +54,7 @@ class CapresController extends Controller
         return $this->capresService->parseKarirService($data);
     }
 
-    public function hitungUmur(carbon $data): int
+    public function hitungUmur(Carbon $data): int
     {
         return $this->capresService->hitungUmurService($data);
     }

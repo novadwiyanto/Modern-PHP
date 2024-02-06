@@ -32,8 +32,7 @@ class CapresService
 
     public function parseKarirService(string $data)
     {
-        $pattern = '/^(.*?)\s*\((\d{4})-(\d{4}|\S+)\)$/';
-        $matches = [];
+        $pattern = '/^(.*?) \((\d{4})-(\d{4})/';
 
         if (preg_match($pattern, $data, $matches)) {
             return new KarirDTO(
