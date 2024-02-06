@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Enums\PosisiEnum;
 use App\Services\CapresService;
 use Carbon\Carbon;
+use Exception;
 
 class CapresController extends Controller
 {
@@ -21,26 +22,33 @@ class CapresController extends Controller
     {
         $url = 'https://mocki.io/v1/92a1f2ef-bef2-4f84-8f06-1965f0fca1a7';
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
+        try {
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
 
-        $response = curl_exec($ch);
+            $response = curl_exec($ch);
 
-        curl_close($ch);
+            if (curl_errno($ch)) {
+                throw new Exception('cURL Error: '.curl_error($ch));
+            }
 
-        $data = json_decode($response, true);
+            curl_close($ch);
 
-        foreach ($data['calon_presiden'] as $item) {
-            $capresDTO[] = $this->parseCalonDTO($item, PosisiEnum::PRESIDEN);
+            $data = json_decode($response, true);
+
+            foreach ($data['calon_presiden'] as $item) {
+                $capresDTO[] = self::parseCalonDTO($item, PosisiEnum::PRESIDEN);
+            }
+
+            foreach ($data['calon_wakil_presiden'] as $item) {
+                $cawapresDTO[] = self::parseCalonDTO($item, PosisiEnum::WAKIL_PRESIDEN);
+            }
+
+            return view('capres', ['capres' => $capresDTO, 'cawapres' => $cawapresDTO]);
+        } catch (Exception $e) {
+            echo 'Error: '.$e->getMessage();
         }
-
-        foreach ($data['calon_wakil_presiden'] as $item) {
-            $cawapresDTO[] = $this->parseCalonDTO($item, PosisiEnum::WAKIL_PRESIDEN);
-        }
-
-        return view('capres', ['capres' => $capresDTO, 'cawapres' => $cawapresDTO]);
 
     }
 
@@ -54,19 +62,19 @@ class CapresController extends Controller
         return $this->capresService->parseKarirService($data);
     }
 
-    public function hitungUmur(carbon $data): int
+    public function hitungUmur(Carbon $data): int
     {
         return $this->capresService->hitungUmurService($data);
     }
 
     public function parseCalonDTO($item, PosisiEnum $posisi): array
     {
-        $tanggal_lahir = $this->parseTanggalLahir($item['tempat_tanggal_lahir']);
-        $usia = $this->hitungUmur($this->parseTanggalLahir($item['tempat_tanggal_lahir']));
+        $tanggal_lahir = self::parseTanggalLahir($item['tempat_tanggal_lahir']);
+        $usia = self::hitungUmur(self::parseTanggalLahir($item['tempat_tanggal_lahir']));
 
         $karirArr = [];
         foreach ($item['karir'] as $itemKarir) {
-            $karirArr[] = $this->parseKarir($itemKarir);
+            $karirArr[] = self::parseKarir($itemKarir);
         }
 
         $calonDTO[] = $this->capresService->showService($item, $posisi, $tanggal_lahir, $usia, $karirArr);

@@ -15,4 +15,3 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [CapresController::class, 'show']);
-// Route::get('/test', [CapresController::class, 'parseKarir']);
